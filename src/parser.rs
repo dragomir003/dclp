@@ -12,8 +12,13 @@ pub use error::ParseError;
 /// If everything is ok returns ```Args``` else an Error
 pub fn parse(arg_config: Config) -> Result<Args, ParseError> {
     let mut args = env::args();
-    let program_name = args.next().ok_or(ParseError::NoProgramName)?;
+    let program_name = get_program_name(args.next().ok_or(ParseError::NoProgramName)?);
     parse_inputs(arg_config, args.peekable(), program_name)
+}
+
+fn get_program_name(path: String) -> String {
+    let splitter = if cfg!(windows) { '\\' } else { '/' };
+    path.split(splitter).last().unwrap().to_string()
 }
 
 fn parse_inputs(
